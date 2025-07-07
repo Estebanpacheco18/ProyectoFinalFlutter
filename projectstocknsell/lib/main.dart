@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'login_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +17,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const ProductsPage(title: 'Lista de Productos'),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const LoginPage(),
+        '/products': (context) => const ProductsPage(title: 'Lista de Productos'),
+      },
     );
   }
 }
@@ -32,18 +37,17 @@ class ProductsPage extends StatefulWidget {
 class _ProductsPageState extends State<ProductsPage> {
   late Future<List<dynamic>> _products;
 
-Future<List<dynamic>> fetchProducts() async {
-  final response = await http.get(
-    Uri.parse('https://laboratorio06-web-backend.onrender.com/api/products'),
-  );
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    print(data);
-    return data;
-  } else {
-    throw Exception('Error al cargar productos');
+  Future<List<dynamic>> fetchProducts() async {
+    final response = await http.get(
+      Uri.parse('https://laboratorio06-web-backend.onrender.com/api/products'),
+    );
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data;
+    } else {
+      throw Exception('Error al cargar productos');
+    }
   }
-}
 
   @override
   void initState() {
@@ -68,17 +72,17 @@ Future<List<dynamic>> fetchProducts() async {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No hay productos.'));
           } else {
-return ListView.builder(
-  itemCount: snapshot.data!.length,
-  itemBuilder: (context, index) {
-    final product = snapshot.data![index];
-    return ListTile(
-      title: Text(product['nombre'] ?? 'Sin nombre'),
-      subtitle: Text(product['descripcion'] ?? ''),
-      trailing: Text('\$${product['precio']?.toString() ?? ''}'),
-    );
-  },
-);
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final product = snapshot.data![index];
+                return ListTile(
+                  title: Text(product['nombre'] ?? 'Sin nombre'),
+                  subtitle: Text(product['descripcion'] ?? ''),
+                  trailing: Text('\$${product['precio']?.toString() ?? ''}'),
+                );
+              },
+            );
           }
         },
       ),
