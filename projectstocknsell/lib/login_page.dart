@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'theme_toggle_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,11 +26,12 @@ class _LoginPageState extends State<LoginPage> {
       }),
     );
     if (response.statusCode == 200) {
-      // Login exitoso, puedes guardar el token si se recibe uno
       final data = json.decode(response.body);
-      print(data);
-      // Navega a la pantalla principal o muestra mensaje de éxito
-      Navigator.pushReplacementNamed(context, '/products');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', data['token']);
+      // Guarda los datos del usuario como string JSON
+      await prefs.setString('user', json.encode(data['user']));
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       setState(() {
         errorMessage = 'Credenciales incorrectas';
@@ -39,7 +42,11 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text('Login'),
+      actions: const [
+  ThemeToggleButton(),
+],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
