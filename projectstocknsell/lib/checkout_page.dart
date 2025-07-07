@@ -50,16 +50,23 @@ final productos = cart.map((item) {
     setState(() => isLoading = false);
 
     if (response.statusCode == 200) {
-      await prefs.remove('cart');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Compra realizada con éxito!')),
-      );
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${response.body}')),
-      );
+  await prefs.remove('cart');
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('¡Compra realizada con éxito!')),
+  );
+  Navigator.pop(context);
+} else {
+  String errorMsg = 'Ocurrió un error al procesar la compra';
+  try {
+    final error = json.decode(response.body);
+    if (error is Map && error.containsKey('error')) {
+      errorMsg = error['error'];
     }
+  } catch (_) {}
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(errorMsg)),
+  );
+}
   }
 
   @override

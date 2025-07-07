@@ -29,10 +29,12 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Carrito'),
-      actions: const [
-  ThemeToggleButton(),
-],),
+      appBar: AppBar(
+        title: const Text('Carrito'),
+        actions: const [
+          ThemeToggleButton(),
+        ],
+      ),
       body: cart.isEmpty
           ? const Center(child: Text('El carrito está vacío'))
           : Column(
@@ -45,7 +47,22 @@ class _CartPageState extends State<CartPage> {
                       return ListTile(
                         title: Text(product['nombre'] ?? ''),
                         subtitle: Text('Cantidad: ${product['cantidad'] ?? 1}'),
-                        trailing: Text('\$${product['precio'] ?? ''}'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('\$${product['precio'] ?? ''}'),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () async {
+                                final prefs = await SharedPreferences.getInstance();
+                                setState(() {
+                                  cart.removeAt(index);
+                                  prefs.setString('cart', json.encode(cart));
+                                });
+                              },
+                            ),
+                          ],
+                        ),
                       );
                     },
                   ),
