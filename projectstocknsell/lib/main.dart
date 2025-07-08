@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'login_page.dart';
 import 'home_page.dart';
 import 'checkout_page.dart';
+import 'register_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -70,6 +71,7 @@ class MyApp extends StatelessWidget {
             '/': (context) => const LoginPage(),
             '/home': (context) => const HomePage(),
             '/checkout': (context) => const CheckoutPage(),
+            '/register': (context) => const RegisterPage(),
           },
         );
       },

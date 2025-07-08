@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:confetti/confetti.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -14,6 +15,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final cardController = TextEditingController();
   final nameController = TextEditingController();
   bool isLoading = false;
+  final ConfettiController _confettiController =
+      ConfettiController(duration: const Duration(seconds: 2));
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
 
   Future<void> makeOrder(BuildContext context) async {
     setState(() => isLoading = true);
@@ -28,7 +37,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       return {
         'productoId': item['_id'],
         'cantidad': item['cantidad'],
-        'preciounitario': item['precio'],
+        'precioUnitario': item['precio'], // Usa el nombre correcto
       };
     }).toList();
 
@@ -50,10 +59,45 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     if (response.statusCode == 200) {
       await prefs.remove('cart');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Compra realizada con éxito!')),
+      _confettiController.play();
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Stack(
+          alignment: Alignment.center,
+          children: [
+            AlertDialog(
+              backgroundColor: Theme.of(context).cardColor,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              title: const Text(
+                '¡Felicidades!',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              ),
+              content: const Text(
+                'Tu compra se realizó con éxito.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              shouldLoop: false,
+              emissionFrequency: 0.05,
+              numberOfParticles: 30,
+              maxBlastForce: 20,
+              minBlastForce: 8,
+              gravity: 0.2,
+            ),
+          ],
+        ),
       );
-      Navigator.pop(context);
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) {
+        Navigator.of(context)
+            .popUntil((route) => route.settings.name == '/home');
+      }
     } else {
       String errorMsg = 'Ocurrió un error al procesar la compra';
       try {
@@ -107,7 +151,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   decoration: InputDecoration(
                     labelText: 'Nombre en la tarjeta',
                     filled: true,
-                    fillColor: theme.brightness == Brightness.dark ? Colors.black : Colors.white,
+                    fillColor: theme.brightness == Brightness.dark
+                        ? Colors.black
+                        : Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -119,7 +165,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   decoration: InputDecoration(
                     labelText: 'Número de tarjeta',
                     filled: true,
-                    fillColor: theme.brightness == Brightness.dark ? Colors.black : Colors.white,
+                    fillColor: theme.brightness == Brightness.dark
+                        ? Colors.black
+                        : Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

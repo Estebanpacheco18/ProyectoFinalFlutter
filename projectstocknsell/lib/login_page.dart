@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'theme_toggle_button.dart';
 
 class LoginPage extends StatefulWidget {
@@ -38,6 +39,20 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> loginWithGoogle() async {
+    const url = 'https://laboratorio06-web-backend.onrender.com/auth/google';
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.externalApplication,
+      );
+    } else {
+      setState(() {
+        errorMessage = 'No se pudo abrir el navegador para Google Login';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -67,6 +82,15 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Icono personalizado arriba del título
+                Center(
+                  child: Image.asset(
+                    './assets/icons/mi_icono.png',
+                    width: 80,
+                    height: 80,
+                  ),
+                ),
+                const SizedBox(height: 16),
                 const Text(
                   'Bienvenido',
                   textAlign: TextAlign.center,
@@ -114,6 +138,25 @@ class _LoginPageState extends State<LoginPage> {
                     'Iniciar sesión',
                     style: TextStyle(fontSize: 16),
                   ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.login),
+                  label: const Text('Iniciar sesión con Google'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: loginWithGoogle,
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () => Navigator.pushNamed(context, '/register'),
+                  child: const Text('¿No tienes cuenta? Regístrate'),
                 ),
                 if (errorMessage != null) ...[
                   const SizedBox(height: 12),
