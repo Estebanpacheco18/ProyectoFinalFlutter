@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
       builder: (context, currentMode, _) {
         return MaterialApp(
           title: 'Productos',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             brightness: Brightness.light,
             primaryColor: const Color(0xFF9CAF88), // sageGreen
