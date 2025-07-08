@@ -19,13 +19,26 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   bool _isLoggingIn = false;
 
   Future<void> login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
     setState(() => _isLoggingIn = true);
+
+    // Validación de correo
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(email)) {
+      setState(() {
+        errorMessage = 'Por favor ingresa un correo válido.';
+        _isLoggingIn = false;
+      });
+      return;
+    }
+
     final response = await http.post(
       Uri.parse('https://laboratorio06-web-backend.onrender.com/api/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'email': emailController.text,
-        'password': passwordController.text,
+        'email': email,
+        'password': password,
       }),
     );
     if (response.statusCode == 200) {

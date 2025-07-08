@@ -181,14 +181,23 @@ class _ProductsPageState extends State<ProductsPage> with TickerProviderStateMix
                           const SizedBox(height: 8),
                           Align(
                             alignment: Alignment.centerRight,
-                            child: AnimatedScale(
-                              scale: _animatingIndex == index ? 1.3 : 1.0,
-                              duration: const Duration(milliseconds: 300),
-                              child: IconButton(
-                                icon: Icon(Icons.add_shopping_cart, color: theme.primaryColor),
-                                onPressed: () => showQuantityDialog(product, index),
-                              ),
-                            ),
+                            child: (product['stock'] ?? 0) > 0
+                                ? AnimatedScale(
+                                    scale: _animatingIndex == index ? 1.3 : 1.0,
+                                    duration: const Duration(milliseconds: 300),
+                                    child: IconButton(
+                                      icon: Icon(Icons.add_shopping_cart, color: theme.primaryColor),
+                                      onPressed: () => showQuantityDialog(product, index),
+                                      tooltip: 'Añadir al carrito',
+                                    ),
+                                  )
+                                : const Text(
+                                    'Sin stock',
+                                    style: TextStyle(
+                                      color: Colors.redAccent,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
