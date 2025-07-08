@@ -16,10 +16,6 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   String? errorMessage;
 
-  final Color sageGreen = const Color(0xFF9CAF88);
-  final Color beige = const Color(0xFFF5F5DC);
-  final Color beigeDark = const Color(0xFFE6DCC3);
-
   Future<void> login() async {
     final response = await http.post(
       Uri.parse('https://laboratorio06-web-backend.onrender.com/api/login'),
@@ -44,10 +40,11 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: beige,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: sageGreen,
+        backgroundColor: theme.primaryColor,
         title: const Text('Login'),
         actions: const [ThemeToggleButton()],
       ),
@@ -57,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: beigeDark,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
@@ -84,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: InputDecoration(
                     labelText: 'Email',
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: theme.brightness == Brightness.dark ? Colors.black : Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -97,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: InputDecoration(
                     labelText: 'Contraseña',
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: theme.brightness == Brightness.dark ? Colors.black : Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -106,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: sageGreen,
+                    backgroundColor: theme.primaryColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

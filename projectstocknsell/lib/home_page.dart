@@ -14,9 +14,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  final Color sageGreen = const Color(0xFF9CAF88);
-  final Color beige = const Color(0xFFF5F5DC);
-
   static final List<Widget> _pages = <Widget>[
     ProductsPage(),
     CartPage(),
@@ -32,15 +29,16 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: beige, // Fondo beige para todas las vistas
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: sageGreen,
+        selectedItemColor: theme.primaryColor,
         unselectedItemColor: Colors.grey,
-        backgroundColor: beige,
+        backgroundColor: theme.cardColor,
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(

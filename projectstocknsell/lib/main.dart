@@ -9,7 +9,6 @@ void main() {
   runApp(const MyApp());
 }
 
-// Notificador global para el tema
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 class MyApp extends StatelessWidget {
@@ -23,17 +22,47 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'Productos',
           theme: ThemeData(
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.deepPurple,
-    brightness: Brightness.light,
-  ),
-),
-darkTheme: ThemeData(
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.deepPurple,
-    brightness: Brightness.dark,
-  ),
-),
+            brightness: Brightness.light,
+            primaryColor: const Color(0xFF9CAF88), // sageGreen
+            scaffoldBackgroundColor: const Color(0xFFF5F5DC), // beige
+            cardColor: const Color(0xFFE6DCC3), // beigeDark
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF9CAF88),
+              foregroundColor: Colors.black,
+            ),
+            textTheme: const TextTheme(
+              bodyMedium: TextStyle(color: Colors.black87),
+              bodyLarge: TextStyle(color: Colors.black87),
+              titleLarge: TextStyle(color: Colors.black87),
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF9CAF88),
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            primaryColor: const Color(0xFF9CAF88),
+            scaffoldBackgroundColor: const Color(0xFF23231F), // beige oscuro
+            cardColor: const Color(0xFF3A3A2E), // beigeDark oscuro
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF9CAF88),
+              foregroundColor: Colors.white,
+            ),
+            textTheme: const TextTheme(
+              bodyMedium: TextStyle(color: Colors.white),
+              bodyLarge: TextStyle(color: Colors.white),
+              titleLarge: TextStyle(color: Colors.white),
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF9CAF88),
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ),
           themeMode: currentMode,
           initialRoute: '/',
           routes: {

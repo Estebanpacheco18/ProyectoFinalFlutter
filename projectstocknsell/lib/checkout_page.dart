@@ -15,10 +15,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final nameController = TextEditingController();
   bool isLoading = false;
 
-  final Color sageGreen = const Color(0xFF9CAF88);
-  final Color beige = const Color(0xFFF5F5DC);
-  final Color beigeDark = const Color(0xFFE6DCC3);
-
   Future<void> makeOrder(BuildContext context) async {
     setState(() => isLoading = true);
     final prefs = await SharedPreferences.getInstance();
@@ -74,10 +70,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: beige,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: sageGreen,
+        backgroundColor: theme.primaryColor,
         title: const Text('Confirmar compra'),
       ),
       body: Center(
@@ -86,7 +83,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: beigeDark,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
@@ -110,7 +107,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   decoration: InputDecoration(
                     labelText: 'Nombre en la tarjeta',
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: theme.brightness == Brightness.dark ? Colors.black : Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -122,7 +119,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   decoration: InputDecoration(
                     labelText: 'Número de tarjeta',
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: theme.brightness == Brightness.dark ? Colors.black : Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -134,7 +131,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ? const Center(child: CircularProgressIndicator())
                     : ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: sageGreen,
+                          backgroundColor: theme.primaryColor,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),

@@ -13,10 +13,6 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   List<dynamic> cart = [];
 
-  final Color sageGreen = const Color(0xFF9CAF88);
-  final Color beige = const Color(0xFFF5F5DC);
-  final Color beigeDark = const Color(0xFFE6DCC3);
-
   @override
   void initState() {
     super.initState();
@@ -37,10 +33,11 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: beige,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: sageGreen,
+        backgroundColor: theme.primaryColor,
         title: const Text('Carrito'),
         actions: const [ThemeToggleButton()],
       ),
@@ -51,84 +48,93 @@ class _CartPageState extends State<CartPage> {
                 style: TextStyle(fontSize: 16),
               ),
             )
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: cart.length,
-                    itemBuilder: (context, index) {
-                      final product = cart[index];
-                      return Card(
-                        color: beigeDark,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 3,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 16),
-                          title: Text(
-                            product['nombre'] ?? '',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+          : SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: cart.length,
+                      itemBuilder: (context, index) {
+                        final product = cart[index];
+                        return Card(
+                          color: theme.cardColor,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 3,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 16),
+                            title: Text(
+                              product['nombre'] ?? '',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: theme.textTheme.bodyMedium?.color,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Cantidad: ${product['cantidad'] ?? 1}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: theme.textTheme.bodyMedium?.color,
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '\$${product['precio'] ?? ''}',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: theme.textTheme.bodyMedium?.color,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline,
+                                      color: Colors.redAccent),
+                                  onPressed: () async {
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    setState(() {
+                                      cart.removeAt(index);
+                                      prefs.setString(
+                                          'cart', json.encode(cart));
+                                    });
+                                  },
+                                ),
+                              ],
                             ),
                           ),
-                          subtitle: Text(
-                            'Cantidad: ${product['cantidad'] ?? 1}',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '\$${product['precio'] ?? ''}',
-                                style: const TextStyle(fontSize: 15),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline,
-                                    color: Colors.redAccent),
-                                onPressed: () async {
-                                  final prefs =
-                                      await SharedPreferences.getInstance();
-                                  setState(() {
-                                    cart.removeAt(index);
-                                    prefs.setString(
-                                        'cart', json.encode(cart));
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: sageGreen,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primaryColor,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                      ),
-                      onPressed: goToCheckout,
-                      child: const Text(
-                        'Comprar',
-                        style: TextStyle(fontSize: 16),
+                        onPressed: goToCheckout,
+                        child: const Text(
+                          'Comprar',
+                          style: TextStyle(fontSize: 16),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
     );
   }
