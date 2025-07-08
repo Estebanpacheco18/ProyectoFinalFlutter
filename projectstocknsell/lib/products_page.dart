@@ -14,6 +14,10 @@ class ProductsPage extends StatefulWidget {
 class _ProductsPageState extends State<ProductsPage> {
   late Future<List<dynamic>> _products;
 
+  final Color sageGreen = const Color(0xFF9CAF88);
+  final Color beige = const Color(0xFFF5F5DC);
+  final Color beigeDark = const Color(0xFFE6DCC3);
+
   Future<List<dynamic>> fetchProducts() async {
     final response = await http.get(
       Uri.parse('https://laboratorio06-web-backend.onrender.com/api/products'),
@@ -33,7 +37,9 @@ class _ProductsPageState extends State<ProductsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Selecciona cantidad (Stock: $stock)'),
+          backgroundColor: beige,
+          title: Text('Selecciona cantidad (Stock: $stock)',
+              style: TextStyle(color: sageGreen)),
           content: StatefulBuilder(
             builder: (context, setState) {
               return Row(
@@ -59,9 +65,12 @@ class _ProductsPageState extends State<ProductsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
+              child: Text('Cancelar', style: TextStyle(color: sageGreen)),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: sageGreen,
+              ),
               onPressed: () {
                 addToCart(product, quantity);
                 Navigator.pop(context);
@@ -94,7 +103,9 @@ class _ProductsPageState extends State<ProductsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: beige,
       appBar: AppBar(
+        backgroundColor: sageGreen,
         title: const Text('Productos'),
         actions: const [ThemeToggleButton()],
       ),
@@ -109,21 +120,42 @@ class _ProductsPageState extends State<ProductsPage> {
             return const Center(child: Text('No hay productos.'));
           } else {
             return ListView.builder(
+              padding: const EdgeInsets.all(12),
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final product = snapshot.data![index];
-                return ListTile(
-                  title: Text(product['nombre'] ?? 'Sin nombre'),
-                  subtitle: Text(product['descripcion'] ?? ''),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('\$${product['precio']?.toString() ?? ''}'),
-                      IconButton(
-                        icon: const Icon(Icons.add_shopping_cart),
-                        onPressed: () => showQuantityDialog(product),
+                return Card(
+                  color: beigeDark,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(16),
+                    title: Text(
+                      product['nombre'] ?? 'Sin nombre',
+                      style: TextStyle(
+                        color: sageGreen,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
                       ),
-                    ],
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(product['descripcion'] ?? ''),
+                        const SizedBox(height: 8),
+                        Text(
+                          '\$${product['precio']?.toString() ?? ''}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.add_shopping_cart, color: sageGreen),
+                      onPressed: () => showQuantityDialog(product),
+                    ),
                   ),
                 );
               },

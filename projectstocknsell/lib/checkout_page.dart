@@ -15,6 +15,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final nameController = TextEditingController();
   bool isLoading = false;
 
+  final Color sageGreen = const Color(0xFF9CAF88);
+  final Color beige = const Color(0xFFF5F5DC);
+  final Color beigeDark = const Color(0xFFE6DCC3);
+
   Future<void> makeOrder(BuildContext context) async {
     setState(() => isLoading = true);
     final prefs = await SharedPreferences.getInstance();
@@ -23,18 +27,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
     if (cart.isEmpty) return;
 
     double total = 0;
-final productos = cart.map((item) {
-  total += (item['precio'] ?? 0) * (item['cantidad'] ?? 1);
-  return {
-    'productoId': item['_id'],
-    'cantidad': item['cantidad'],
-    'preciounitario': item['precio'],
-  };
-}).toList();
+    final productos = cart.map((item) {
+      total += (item['precio'] ?? 0) * (item['cantidad'] ?? 1);
+      return {
+        'productoId': item['_id'],
+        'cantidad': item['cantidad'],
+        'preciounitario': item['precio'],
+      };
+    }).toList();
 
     final token = prefs.getString('token');
 
-    // Llama al backend para crear el pedido y actualizar stock
     final response = await http.post(
       Uri.parse('https://laboratorio06-web-backend.onrender.com/api/orders'),
       headers: {
@@ -50,51 +53,102 @@ final productos = cart.map((item) {
     setState(() => isLoading = false);
 
     if (response.statusCode == 200) {
-  await prefs.remove('cart');
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('¡Compra realizada con éxito!')),
-  );
-  Navigator.pop(context);
-} else {
-  String errorMsg = 'Ocurrió un error al procesar la compra';
-  try {
-    final error = json.decode(response.body);
-    if (error is Map && error.containsKey('error')) {
-      errorMsg = error['error'];
+      await prefs.remove('cart');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('¡Compra realizada con éxito!')),
+      );
+      Navigator.pop(context);
+    } else {
+      String errorMsg = 'Ocurrió un error al procesar la compra';
+      try {
+        final error = json.decode(response.body);
+        if (error is Map && error.containsKey('error')) {
+          errorMsg = error['error'];
+        }
+      } catch (_) {}
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMsg)),
+      );
     }
-  } catch (_) {}
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(errorMsg)),
-  );
-}
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Confirmar compra')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Text('Simulación de pago con tarjeta', style: TextStyle(fontSize: 18)),
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'Nombre en la tarjeta'),
+      backgroundColor: beige,
+      appBar: AppBar(
+        backgroundColor: sageGreen,
+        title: const Text('Confirmar compra'),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: beigeDark,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            TextField(
-              controller: cardController,
-              decoration: const InputDecoration(labelText: 'Número de tarjeta'),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 24),
-            isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: () => makeOrder(context),
-                    child: const Text('Pagar y comprar'),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Simulación de pago con tarjeta',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Nombre en la tarjeta',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-          ],
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: cardController,
+                  decoration: InputDecoration(
+                    labelText: 'Número de tarjeta',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 24),
+                isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: sageGreen,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () => makeOrder(context),
+                        child: const Text(
+                          'Pagar y comprar',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+              ],
+            ),
+          ),
         ),
       ),
     );

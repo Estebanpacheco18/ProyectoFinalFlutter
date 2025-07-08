@@ -13,6 +13,10 @@ class OrdersPage extends StatefulWidget {
 class _OrdersPageState extends State<OrdersPage> {
   List<dynamic> orders = [];
 
+  final Color sageGreen = const Color(0xFF9CAF88);
+  final Color beige = const Color(0xFFF5F5DC);
+  final Color beigeDark = const Color(0xFFE6DCC3);
+
   @override
   void initState() {
     super.initState();
@@ -30,23 +34,79 @@ class _OrdersPageState extends State<OrdersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Pedidos'),
-      actions: const [
-  ThemeToggleButton(),
-],
+      backgroundColor: beige,
+      appBar: AppBar(
+        backgroundColor: sageGreen,
+        title: const Text('Pedidos'),
+        actions: const [ThemeToggleButton()],
       ),
       body: orders.isEmpty
-          ? const Center(child: Text('No hay pedidos'))
+          ? const Center(
+              child: Text(
+                'No hay pedidos',
+                style: TextStyle(fontSize: 16),
+              ),
+            )
           : ListView.builder(
+              padding: const EdgeInsets.all(16),
               itemCount: orders.length,
               itemBuilder: (context, index) {
                 final order = orders[index];
-                return ListTile(
-                  title: Text('Pedido ${index + 1}'),
-                  subtitle: Text('Fecha: ${order['fecha']}'),
-                  onTap: () {
-                    // Puedes mostrar detalles del pedido aquí
-                  },
+                return Card(
+                  color: beigeDark,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 16),
+                    leading: CircleAvatar(
+                      backgroundColor: sageGreen,
+                      child: Text('${index + 1}',
+                          style: const TextStyle(color: Colors.white)),
+                    ),
+                    title: const Text(
+                      'Pedido realizado',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 4),
+                        Text('Fecha: ${order['fecha'] ?? 'Sin fecha'}'),
+                        if (order['total'] != null)
+                          Text('Total: \$${order['total']}'),
+                      ],
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios_rounded,
+                        size: 16, color: Colors.grey),
+                    onTap: () {
+                      // Mostrar detalles del pedido si lo deseas
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            backgroundColor: beige,
+                            title: const Text('Detalles del pedido'),
+                            content: Text(
+                              const JsonEncoder.withIndent('  ')
+                                  .convert(order),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text('Cerrar',
+                                    style: TextStyle(color: sageGreen)),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),
