@@ -29,6 +29,7 @@ class _OrdersPageState extends State<OrdersPage> {
       Uri.parse('https://laboratorio06-web-backend.onrender.com/api/myorders'),
       headers: {'Authorization': 'Bearer $token'},
     );
+    if (!mounted) return; // <-- Agregamos esto antes de setState
     if (response.statusCode == 200) {
       setState(() {
         orders = json.decode(response.body);

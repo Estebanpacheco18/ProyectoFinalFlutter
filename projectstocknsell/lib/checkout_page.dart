@@ -37,7 +37,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       return {
         'productoId': item['_id'],
         'cantidad': item['cantidad'],
-        'precioUnitario': item['precio'], // Usa el nombre correcto
+        'precioUnitario': item['precio'],
       };
     }).toList();
 

@@ -57,55 +57,75 @@ class _CartPageState extends State<CartPage> {
                       itemCount: cart.length,
                       itemBuilder: (context, index) {
                         final product = cart[index];
-                        return Card(
-                          color: theme.cardColor,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                        return Dismissible(
+                          key: Key(product['nombre'] + index.toString()),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            color: Colors.redAccent,
+                            child: const Icon(Icons.delete, color: Colors.white),
                           ),
-                          elevation: 3,
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 16),
-                            title: Text(
-                              product['nombre'] ?? '',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: theme.textTheme.bodyMedium?.color,
-                              ),
+                          onDismissed: (direction) async {
+                            final prefs = await SharedPreferences.getInstance();
+                            setState(() {
+                              cart.removeAt(index);
+                              prefs.setString('cart', json.encode(cart));
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Producto eliminado del carrito')),
+                            );
+                          },
+                          child: Card(
+                            color: theme.cardColor,
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            subtitle: Text(
-                              'Cantidad: ${product['cantidad'] ?? 1}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: theme.textTheme.bodyMedium?.color,
+                            elevation: 3,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12, horizontal: 16),
+                              title: Text(
+                                product['nombre'] ?? '',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: theme.textTheme.bodyMedium?.color,
+                                ),
                               ),
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '\$${product['precio'] ?? ''}',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: theme.textTheme.bodyMedium?.color,
+                              subtitle: Text(
+                                'Cantidad: ${product['cantidad'] ?? 1}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: theme.textTheme.bodyMedium?.color,
+                                ),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    '\$${product['precio'] ?? ''}',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete_outline,
-                                      color: Colors.redAccent),
-                                  onPressed: () async {
-                                    final prefs =
-                                        await SharedPreferences.getInstance();
-                                    setState(() {
-                                      cart.removeAt(index);
-                                      prefs.setString(
-                                          'cart', json.encode(cart));
-                                    });
-                                  },
-                                ),
-                              ],
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline,
+                                        color: Colors.redAccent),
+                                    onPressed: () async {
+                                      final prefs =
+                                          await SharedPreferences.getInstance();
+                                      setState(() {
+                                        cart.removeAt(index);
+                                        prefs.setString(
+                                            'cart', json.encode(cart));
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );

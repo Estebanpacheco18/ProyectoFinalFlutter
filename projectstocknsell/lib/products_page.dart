@@ -11,8 +11,9 @@ class ProductsPage extends StatefulWidget {
   State<ProductsPage> createState() => _ProductsPageState();
 }
 
-class _ProductsPageState extends State<ProductsPage> {
+class _ProductsPageState extends State<ProductsPage> with TickerProviderStateMixin {
   late Future<List<dynamic>> _products;
+  int? _animatingIndex;
 
   Future<List<dynamic>> fetchProducts() async {
     final response = await http.get(
@@ -26,7 +27,21 @@ class _ProductsPageState extends State<ProductsPage> {
     }
   }
 
-  Future<void> showQuantityDialog(Map<String, dynamic> product) async {
+  Future<void> addToCart(Map<String, dynamic> product, int quantity, int index) async {
+    setState(() => _animatingIndex = index);
+    final prefs = await SharedPreferences.getInstance();
+    final cartString = prefs.getString('cart');
+    List<dynamic> cart = cartString != null ? json.decode(cartString) : [];
+    cart.add({...product, 'cantidad': quantity});
+    await prefs.setString('cart', json.encode(cart));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Producto agregado al carrito')),
+    );
+    await Future.delayed(const Duration(milliseconds: 350));
+    setState(() => _animatingIndex = null);
+  }
+
+  Future<void> showQuantityDialog(Map<String, dynamic> product, int index) async {
     int quantity = 1;
     int stock = product['stock'] ?? 1;
     final theme = Theme.of(context);
@@ -69,7 +84,7 @@ class _ProductsPageState extends State<ProductsPage> {
                 backgroundColor: theme.primaryColor,
               ),
               onPressed: () {
-                addToCart(product, quantity);
+                addToCart(product, quantity, index);
                 Navigator.pop(context);
               },
               child: const Text('Agregar'),
@@ -77,17 +92,6 @@ class _ProductsPageState extends State<ProductsPage> {
           ],
         );
       },
-    );
-  }
-
-  Future<void> addToCart(Map<String, dynamic> product, int quantity) async {
-    final prefs = await SharedPreferences.getInstance();
-    final cartString = prefs.getString('cart');
-    List<dynamic> cart = cartString != null ? json.decode(cartString) : [];
-    cart.add({...product, 'cantidad': quantity});
-    await prefs.setString('cart', json.encode(cart));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Producto agregado al carrito')),
     );
   }
 
@@ -122,64 +126,72 @@ class _ProductsPageState extends State<ProductsPage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final product = snapshot.data![index];
-                return Card(
-                  color: theme.cardColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 3,
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: 220,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
+                return AnimatedOpacity(
+                  duration: Duration(milliseconds: 400 + index * 50),
+                  opacity: 1,
+                  child: Card(
+                    color: theme.cardColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: 220,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: product['imagen'] != null && product['imagen'].toString().isNotEmpty
+                                  ? Image.network(
+                                      product['imagen'],
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          const Icon(Icons.broken_image, size: 60),
+                                    )
+                                  : const Center(
+                                      child: Icon(Icons.image_not_supported, size: 60),
+                                    ),
+                            ),
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: product['imagen'] != null && product['imagen'].toString().isNotEmpty
-                                ? Image.network(
-                                    product['imagen'],
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        const Icon(Icons.broken_image, size: 60),
-                                  )
-                                : const Center(
-                                    child: Icon(Icons.image_not_supported, size: 60),
-                                  ),
+                          const SizedBox(height: 12),
+                          Text(
+                            product['nombre'] ?? 'Sin nombre',
+                            style: TextStyle(
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          product['nombre'] ?? 'Sin nombre',
-                          style: TextStyle(
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                          const SizedBox(height: 4),
+                          Text(product['descripcion'] ?? ''),
+                          const SizedBox(height: 8),
+                          Text(
+                            '\$${product['precio']?.toString() ?? ''}',
+                            style: TextStyle(fontSize: 16, color: theme.textTheme.bodyMedium?.color),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(product['descripcion'] ?? ''),
-                        const SizedBox(height: 8),
-                        Text(
-                          '\$${product['precio']?.toString() ?? ''}',
-                          style: TextStyle(fontSize: 16, color: theme.textTheme.bodyMedium?.color),
-                        ),
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                            icon: Icon(Icons.add_shopping_cart, color: theme.primaryColor),
-                            onPressed: () => showQuantityDialog(product),
+                          const SizedBox(height: 8),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: AnimatedScale(
+                              scale: _animatingIndex == index ? 1.3 : 1.0,
+                              duration: const Duration(milliseconds: 300),
+                              child: IconButton(
+                                icon: Icon(Icons.add_shopping_cart, color: theme.primaryColor),
+                                onPressed: () => showQuantityDialog(product, index),
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );

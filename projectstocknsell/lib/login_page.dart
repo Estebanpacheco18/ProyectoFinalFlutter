@@ -12,12 +12,14 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   String? errorMessage;
+  bool _isLoggingIn = false;
 
   Future<void> login() async {
+    setState(() => _isLoggingIn = true);
     final response = await http.post(
       Uri.parse('https://laboratorio06-web-backend.onrender.com/api/login'),
       headers: {'Content-Type': 'application/json'},
@@ -37,6 +39,7 @@ class _LoginPageState extends State<LoginPage> {
         errorMessage = 'Credenciales incorrectas';
       });
     }
+    setState(() => _isLoggingIn = false);
   }
 
   Future<void> loginWithGoogle() async {
@@ -82,7 +85,6 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Icono personalizado arriba del título
                 Center(
                   child: Image.asset(
                     './assets/icons/mi_icono.png',
@@ -125,18 +127,22 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                AnimatedScale(
+                  scale: _isLoggingIn ? 1.1 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  onPressed: login,
-                  child: const Text(
-                    'Iniciar sesión',
-                    style: TextStyle(fontSize: 16),
+                    onPressed: _isLoggingIn ? null : login,
+                    child: const Text(
+                      'Iniciar sesión',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),

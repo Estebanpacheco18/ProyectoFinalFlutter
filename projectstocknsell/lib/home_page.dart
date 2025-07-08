@@ -40,21 +40,53 @@ class _HomePageState extends State<HomePage> {
         unselectedItemColor: Colors.grey,
         backgroundColor: theme.cardColor,
         type: BottomNavigationBarType.fixed,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.store),
+            icon: TweenAnimationBuilder<double>(
+              tween: Tween<double>(
+                  begin: 1.0, end: _selectedIndex == 0 ? 1.3 : 1.0),
+              duration: const Duration(milliseconds: 200),
+              builder: (context, scale, child) => Transform.scale(
+                scale: scale,
+                child: const Icon(Icons.store),
+              ),
+            ),
             label: 'Productos',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: TweenAnimationBuilder<double>(
+              tween: Tween<double>(
+                  begin: 1.0, end: _selectedIndex == 1 ? 1.3 : 1.0),
+              duration: const Duration(milliseconds: 200),
+              builder: (context, scale, child) => Transform.scale(
+                scale: scale,
+                child: const Icon(Icons.shopping_cart),
+              ),
+            ),
             label: 'Carrito',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
+            icon: TweenAnimationBuilder<double>(
+              tween: Tween<double>(
+                  begin: 1.0, end: _selectedIndex == 2 ? 1.3 : 1.0),
+              duration: const Duration(milliseconds: 200),
+              builder: (context, scale, child) => Transform.scale(
+                scale: scale,
+                child: const Icon(Icons.list_alt),
+              ),
+            ),
             label: 'Pedidos',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: TweenAnimationBuilder<double>(
+              tween: Tween<double>(
+                  begin: 1.0, end: _selectedIndex == 3 ? 1.3 : 1.0),
+              duration: const Duration(milliseconds: 200),
+              builder: (context, scale, child) => Transform.scale(
+                scale: scale,
+                child: const Icon(Icons.person),
+              ),
+            ),
             label: 'Cuenta',
           ),
         ],
