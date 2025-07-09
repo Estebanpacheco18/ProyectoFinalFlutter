@@ -5,6 +5,7 @@ import 'login_page.dart';
 import 'home_page.dart';
 import 'checkout_page.dart';
 import 'register_page.dart';
+import 'favorites_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -72,6 +73,7 @@ class MyApp extends StatelessWidget {
             '/home': (context) => const HomePage(),
             '/checkout': (context) => const CheckoutPage(),
             '/register': (context) => const RegisterPage(),
+            '/favorites': (context) => const FavoritesPage(),
           },
         );
       },
